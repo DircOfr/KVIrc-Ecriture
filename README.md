@@ -10,7 +10,7 @@ I just discovered KVIrc (less than 1 month ago), and I don't really know how to 
 
  - Day.kvs contains the aliases.
  - OnTextInput.dfaut.kvs contains what has to be added in event OnTextInput.
- - Action.kvs build the action.
+ - Action.kvs builds the action.
 
 I'm very conscious of all the things I still have to learn about addons.
  But I thought this kind of options should be present in KVIrc, so I'm transmitting what I have done.
