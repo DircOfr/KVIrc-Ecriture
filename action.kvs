@@ -1,0 +1,4 @@
+action.create -w=xcqd (Day,$tr("Ecriture","Ecriture"),$tr("Ecriture","Ecriture"),"$file.localdir(pics/c.png)","$file.localdir(pics/c.png)")
+{
+	Day::inputcolor
+}
