@@ -1,0 +1,22 @@
+event(OnTextInput,dfaut)
+{
+	if($channel) { 
+	  if($Day::containsc(%DayColor{stop},$str.left($0,1)) || $Day::containsc($str.word(0,$chan.mode),c))
+	    %text = $0
+	  elseif(!$Day::containsc(%DayColor{stop},$str.left($0,1)) && $Day::containsc($str.word(0,$chan.mode),S) && !$Day::containsc($str.word(0,$chan.mode),c))
+	    %text = $str.stripcolors($Day::color($target,$0))
+	  else
+	    %text = $Day::color($target,$0)
+	  say %text
+	  halt
+	}
+	elseif($query) {
+	  say $Day::color($target,$0)
+	  halt
+	}
+	else {
+	  say $0
+	  halt
+	}
+}
+
