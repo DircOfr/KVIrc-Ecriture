@@ -1,0 +1,467 @@
+alias(Day::color)
+{
+	%stxt = $1
+	if(%DayColor{style}) {
+	  if(%DayColor{gras})%input .= $b
+	  if(%DayColor{soul})%input .= $u
+	}
+	%a = $str.left(%stxt,1)
+	
+	%b = $str.mid(%stxt,1,1)
+	if((%a >= "0" && %a <= "9" && %DayColor{style} && (%DayColor{majcol} || $str.isempty(%DayColor{fond}))) || (%b >= "0" && %b <= "9" && %DayColor{style} && %DayColor{majcol})) {
+	  if(%DayColor{maj} && !$Day::nickfirst(%stxt)) {
+	    %a = $str.upcase(%a)
+	    %b = $str.rightfromfirst(%stxt,$str.left(%stxt,1))
+	    %input .= %a%b
+	  }
+	  else {
+	    %input .= %stxt
+	  }
+	  %c = ""
+	  %d = ""
+	  if(%DayColor{style}) {
+	    if(%DayColor{gras}) %c = $b
+	    if(%DayColor{soul}) %d = $u
+	  }
+	  return %input
+	}
+	
+	if(%DayColor{maj}) {
+	  %a = $str.upcase(%a)
+	  %b = $str.rightfromfirst(%stxt,$str.left(%stxt,1))
+	  if(%DayColor{style}) {
+	    if(%DayColor{majcol}) {
+	      %col = %DayColor{text}
+	      if(!$str.isempty(%DayColor{fond})) {
+	        %array[]= $str.split(",","00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15")
+	        while(%col == %DayColor{text} || %col == %DayColor{fond}) %col = %array[$rand(15)]
+	      }
+	      else {
+	        %array[] = $str.split(",","04,07,10,12,13")
+	        while(%col == %DayColor{text}) %col = %array[$rand(4)]
+	      }
+	    }
+	    else %col = %DayColor{text}
+	    if(!$Day::nickfirst(%stxt)) {
+	      if($str.isempty(%DayColor{fond})) {
+	        if(%DayColor{majcol})
+	          %input .= $k(%col)%a$k(%DayColor{text})%b
+	        else
+	          %input .= $k(%DayColor{text})%a%b
+	      }
+	      else {
+	        if(%DayColor{majcol})
+	          %input .= $k(%col,%DayColor{fond})%a$k(%DayColor{text})%b
+	        else
+	          %input .= $k(%DayColor{text},%DayColor{fond})%a%b
+	      }
+	    }
+	    else {
+	      %d = $Day::nickfirst(%stxt)
+	      %d += 1
+	      %a = $str.left(%stxt,%d)
+	      %b = $str.mid(%stxt,%d,1)
+	      %e = $str.rightfromfirst(%stxt,$str.left(%stxt,%d))
+	      %e = $str.left(%e,$str.findfirst(%e," "))
+	      if(!%e) %e=" "
+	        %d += 1
+	        %c = $str.rightfromfirst(%stxt,$str.left(%stxt,%d))
+	      if(!$chan.ison(%e,$channel)) {
+	        if($str.isempty(%DayColor{fond})) {
+	          if(%DayColor{majcol} && (%b < "0" || %b > "9"))
+	            %input .= $k(%DayColor{text})%a$k(%col)%b$k(%DayColor{text})%c
+	          else
+	            %input .= $k(%DayColor{text})%a%b%c
+	        }
+	        else {
+	          if(%DayColor{majcol} && (%b < "0" || %b > "9"))
+	            %input .= $k(%DayColor{text},%DayColor{fond})%a$k(%col)%b$k(%DayColor{text})%c
+	          else
+	            %input .= $k(%DayColor{text},%DayColor{fond})%a%b%c
+	        }
+	      }
+	      else {
+	        if($str.isempty(%DayColor{fond})) %input .= $k(%DayColor{text})%a%b%c
+	        else %input .= $k(%DayColor{text},%DayColor{fond})%a%b%c
+	      }
+	    }
+	  }
+	  else %input .= %a%b
+	}
+	else {
+	  if(%DayColor{style}) {
+	    if($str.isempty(%DayColor{fond})) %input .= $k(%DayColor{text})%stxt
+	    else %input .= $k(%DayColor{text},%DayColor{fond})%stxt
+	  }
+	  else %input .= %stxt
+	}
+	return %input
+}
+
+
+alias(Day::containsc)
+{
+	if($str.contains($0,$1,1))
+	  return 1
+	else
+	  return 0
+}
+
+
+alias(Day::equalc)
+{
+	if($str.equal($0,$1,1)) return 1
+	else return 0
+}
+
+
+alias(Day::inputcolor)
+{
+	if($objects.exists(%WidgetShow2))
+	  delete %WidgetShow2
+	%WidgetShow2 = $new(widget,0,Day)
+	%WidgetShow2->$setWindowTitle("Configuration de l'écriture")
+	%WidgetShow2->$setWindowIcon($file.localdir(pics/c.png))
+	%WidgetShow2->$setGeometry(0,0,490,300)
+	%WidgetShow2->$centerToScreen()
+	%WidgetShow2->%layout = $new(layout,%WidgetShow2,LAYOUT)
+	%WidgetShow2->%layout->$setMargin(5)
+	%WidgetShow2->%color = $new(groupbox,%WidgetShow2)
+	%WidgetShow2->%color->$setTitle("Paramètres")
+	%WidgetShow2->%color->$setGeometry(10,10,470,200)
+	Day::load
+	%WidgetShow2->%color->%checkbox4 = $new(checkbox,%WidgetShow2)
+	%WidgetShow2->%color->%checkbox4->$settext("1ère lettre en majuscule")
+	%WidgetShow2->%color->%checkbox4->$setGeometry(20,40,200,20)
+	%WidgetShow2->%color->%checkbox = $new(checkbox,%WidgetShow2)
+	%WidgetShow2->%color->%checkbox->$settext(Activer le style d'écriture)
+	%WidgetShow2->%color->%checkbox->$setGeometry(20,70,200,20)
+	%WidgetShow2->%color->%label = $new(label,%WidgetShow2)
+	%WidgetShow2->%color->%label->$settext(Stoppeurs :)
+	%WidgetShow2->%color->%label->$setGeometry(305,40,120,20)
+	%WidgetShow2->%color->%lineedit = $new(lineedit,%WidgetShow2)
+	%WidgetShow2->%color->%lineedit->$settext("%DayColor{stop}")
+	%WidgetShow2->%color->%lineedit->$setGeometry(370,38,100,22)
+	%WidgetShow2->%color->%group = $new(groupbox,%WidgetShow2)
+	%WidgetShow2->%color->%group->$setTitle("Style d'écriture")
+	%WidgetShow2->%color->%group->$setGeometry(20,100,450,100)
+	%WidgetShow2->%color->%checkbox2 = $new(checkbox,%WidgetShow2)
+	%WidgetShow2->%color->%checkbox2->$settext("Gras")
+	%WidgetShow2->%color->%checkbox2->$setGeometry(30,160,100,20)
+	%WidgetShow2->%color->%checkbox3 = $new(checkbox,%WidgetShow2)
+	%WidgetShow2->%color->%checkbox3->$settext("Souligné")
+	%WidgetShow2->%color->%checkbox3->$setGeometry(120,160,100,20)
+	%WidgetShow2->%color->%checkbox10 = $new(checkbox,%WidgetShow2)
+	%WidgetShow2->%color->%checkbox10->$settext("1ère lettre majuscule en couleur")
+	%WidgetShow2->%color->%checkbox10->$setGeometry(30,130,220,20)
+	%WidgetShow2->%color->%label2 = $new(label,%WidgetShow2)
+	%WidgetShow2->%color->%label2->$settext(Couleur du texte :)
+	%WidgetShow2->%color->%label2->$setGeometry(250,130,100,20)
+	%WidgetShow2->%color->%label3 = $new(label,%WidgetShow2)
+	%WidgetShow2->%color->%label3->$settext(Couleur du fond :)
+	%WidgetShow2->%color->%label3->$setGeometry(250,160,100,20)
+	%WidgetShow2->%color->%listview = $new(combobox,%WidgetShow2)
+	%colors = "blanc,noir,bleu,vert,rouge,marron,violet,orange,jaune,vert clair,turquoise,bleu ciel,bleu clair,rose,gris,gris clair"
+	%array[] = $str.split(",",%colors)
+	for(%i = 0;%i < %array[]#;%i++) {
+	  if($Day::equalc(%i,$int(%DayColor{text})))
+	    %WidgetShow2->%color->%listview->$insertItem("%array[%i]")
+	}
+	for(%i = 0;%i < %array[]#;%i++) {
+	  if(!$Day::equalc(%i,$int(%DayColor{text})))
+	    %WidgetShow2->%color->%listview->$insertItem("%array[%i]")
+	}
+	%WidgetShow2->%color->%listview->$setGeometry(350,128,110,22)
+	%WidgetShow2->%color->%listview2 = $new(combobox,%WidgetShow2)
+	%colors = "aucun,blanc,noir,bleu,vert,rouge,marron,violet,orange,jaune,vert clair,turquoise,bleu ciel,bleu clair,rose,gris,gris clair"
+	%array[] = $str.split(",",%colors)
+	if(!$str.isempty(%DayColor{fond})) {
+	  %tmp = $int(%DayColor{fond})
+	  for(%i = 0;%i < %array[]#;%i++) {
+	    if($Day::equalc($(%i-1),$(%tmp)))
+	      %WidgetShow2->%color->%listview2->$insertItem("%array[%i]")
+	  }
+	  for(%i = 0;%i < %array[]#;%i++) {
+	    if(!$Day::equalc($(%i-1),$(%tmp)))
+	      %WidgetShow2->%color->%listview2->$insertItem("%array[%i]")
+	  }
+	}
+	else {
+	  for(%i = 0;%i < %array[]#;%i++) {
+	    %WidgetShow2->%color->%listview2->$insertItem("%array[%i]")
+	  }
+	}
+	%WidgetShow2->%color->%listview2->$setGeometry(350,158,110,22)
+	%msg2 = "exemple pour votre style d'écriture !"
+	if(%DayColor{maj}) {
+	  %a = $str.left(%msg2,1)
+	  %a = "<font style=\"text-transform: uppercase\;\">%a</font>"
+	  %b = $str.rightfromfirst(%msg2,$str.left(%msg2,1))
+	  if(%DayColor{style}) {
+	    if(%DayColor{gras}) {
+	      %a = <b>%a
+	      %b = %b</b>
+	    }
+	    if(%DayColor{soul}) {
+	      %a = <u>%a
+	      %b = %b</u>
+	    }
+	    if(%DayColor{majcol}) {
+	      %col = %DayColor{text}
+	      if(!$str.isempty(%DayColor{fond})) {
+	        %array[]= $str.split(",","00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15")
+	        while(%col == %DayColor{text} || %col == %DayColor{fond}) %col = %array[$rand(15)]
+	      }
+	      else {
+	        %array[] = $str.split(",","04,07,10,12,13")
+	        while(%col == %DayColor{text}) %col = %array[$rand(4)]
+	      }
+	      %msg .= "<body bgcolor=\""#$Day::mircol(%DayColor{fond})"\"><font style=\"font-size:12pt;\"><font color=\""#$Day::mircol(%col)"\">%a<font color=\""#$Day::mircol(%DayColor{text})"\">%b</font></body>"
+	    }
+	    else %msg .= "<body bgcolor=\""#$Day::mircol(%DayColor{fond})"\"><font style=\"font-size:12pt;\"><font color=\""#$Day::mircol(%DayColor{text})"\">%a%b</font></body>"
+	  }
+	  else %msg .= "<body style=\"font-size:12pt;\">%a%b</font></body>"
+	}
+	else
+	{
+	  if(%DayColor{style}) {
+	    if(%DayColor{gras}) %msg2 = <b>%msg2</b>
+	    if(%DayColor{soul}) %msg2 = <u>%msg2</u>
+	    %msg .= "<body bgcolor=\""#$Day::mircol(%DayColor{gras})"\"><font color=\""#$Day::mircol(%DayColor{text})"\" style=\"font-size:12pt;\">%msg2</font></body>"
+	  }
+	  else %msg .= "<body style=\"font-size:12pt;\">%msg2</font></body>"
+	}
+	%WidgetShow2->%color->%label4 = $new(textbrowser,%WidgetShow2)
+	%WidgetShow2->%color->%label4->$settext(%msg)
+	%WidgetShow2->%color->%label4->$setGeometry(11,220,308,30)
+	%WidgetShow2->%color->%boutonSave = $new(button,%WidgetShow2)
+	%WidgetShow2->%color->%boutonSave->$setImage(10)
+	%WidgetShow2->%color->%boutonSave->$settext("Visualiser / Sauvegarder")
+	%WidgetShow2->%color->%boutonSave->$setGeometry(325,219,155,32)
+	%WidgetShow2->%buttonclose=$new(button,%WidgetShow2)
+	%WidgetShow2->%buttonclose->$setImage(43)
+	%WidgetShow2->%buttonclose->$settext("Valider / Fermer")
+	%WidgetShow2->%buttonclose->$setGeometry(10,259,470,32)
+	privateimpl(%WidgetShow2->%buttonclose, mousePressEvent) {
+	  delete %WidgetShow2
+	}
+	if(%DayColor{soul}) %WidgetShow2->%color->%checkbox3->$setChecked(1);
+	else %WidgetShow2->%color->%checkbox3->$setChecked(0);
+	if(%DayColor{gras}) %WidgetShow2->%color->%checkbox2->$setChecked(1);
+	else %WidgetShow2->%color->%checkbox2->$setChecked(0);
+	if(%DayColor{maj}) %WidgetShow2->%color->%checkbox4->$setChecked(1);
+	else %WidgetShow2->%color->%checkbox4->$setChecked(0);
+	if(%DayColor{majcol}) %WidgetShow2->%color->%checkbox10->$setChecked(1);
+	else %WidgetShow2->%color->%checkbox10->$setChecked(0);
+	if(%DayColor{style}) %WidgetShow2->%color->%checkbox->$setChecked(1);
+	else %WidgetShow2->%color->%checkbox->$setChecked(0);
+	privateimpl(%WidgetShow2->%color->%checkbox4,toggleEvent) {
+	  if(!$0) %DayColor{maj} = 0
+	  else %DayColor{maj} = 1
+	}
+	privateimpl(%WidgetShow2->%color->%checkbox10,toggleEvent) {
+	  if(!$0) %DayColor{majcol} = 0
+	  else %DayColor{majcol} = 1
+	}
+	privateimpl(%WidgetShow2->%color->%checkbox,toggleEvent) {
+	  if(!$0) %DayColor{style} = 0
+	  else %DayColor{style} = 1
+	}
+	privateImpl(%WidgetShow2->%color->%lineedit, textChangedEvent) {
+	  %text = %WidgetShow2->%color->%lineedit->$text
+	  %DayColor{stop} = %text
+	}
+	privateimpl(%WidgetShow2->%color->%boutonSave, mousePressEvent) {
+	  %colors = "blanc,noir,bleu,vert,rouge,marron,violet,orange,jaune,vert clair,turquoise,bleu ciel,bleu clair,rose,gris,gris clair"
+	  %array[] = $str.split(",",%colors)
+	  %a = %WidgetShow2->%color->%listview->$current 
+	  %b = %WidgetShow2->%color->%listview2->$current
+	  for(%i = 0;%i < %array[]#;%i++) {
+	    if($Day::equalc(%array[%i],%a)) {
+	      if($Day::equalc($str.length(%i),1)) %DayColor{text} = "0%i"
+	      else %DayColor{text} = "%i"
+	    }
+	  }
+	  if(%b != aucun) {
+	    for(%i = 0;%i < %array[]#;%i++){
+	      if($Day::equalc(%array[%i],%b)){
+	        if($Day::equalc($str.length(%i),1)) %DayColor{fond} = "0%i"
+	        else %DayColor{fond} = "%i"
+	      }
+	    }
+	  }
+	  else
+	    %DayColor{fond} = ""
+	  if(%WidgetShow2->%color->%checkbox2->$isChecked()) %DayColor{gras} = 1
+	  else %DayColor{gras} = 0
+	  if(%WidgetShow2->%color->%checkbox3->$isChecked()) %DayColor{soul} = 1
+	  else %DayColor{soul} = 0
+	  Day::save
+	  %msg2 = "exemple pour votre style d'écriture !"
+	  if(%DayColor{maj}) {
+	    %a = $str.left(%msg2,1)
+	    %a = "<font style=\"text-transform: uppercase\;\">%a</font>"
+	    %b = $str.rightfromfirst(%msg2,$str.left(%msg2,1))
+	    if(%DayColor{style}) {
+	      if(%DayColor{gras}) {
+	        %a = <b>%a
+	        %b = %b</b>
+	      }
+	      if(%DayColor{soul}) {
+	        %a = <u>%a
+	        %b = %b</u>
+	      }
+	      if(%DayColor{majcol}) {
+	        %col = %DayColor{text}
+	        if(!$str.isempty(%DayColor{fond})) {
+	          %array[]= $str.split(",","00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15")
+	          while(%col == %DayColor{text} || %col == %DayColor{fond}) %col = %array[$rand(15)]
+	        }
+	        else {
+	          %array[] = $str.split(",","04,07,10,12,13")
+	          while(%col == %DayColor{text}) %col = %array[$rand(4)]
+	        }
+	        %msg .= "<body bgcolor=\""#$Day::mircol(%DayColor{fond})"\"><font style=\"font-size:12pt;\"><font color=\""#$Day::mircol(%col)"\">%a<font color=\""#$Day::mircol(%DayColor{text})"\">%b</font></body>"
+	      }
+	      else %msg .= "<body bgcolor=\""#$Day::mircol(%DayColor{fond})"\"><font style=\"font-size:12pt;\"><font color=\""#$Day::mircol(%DayColor{text})"\">%a%b</font></body>"
+	    }
+	    else %msg .= "<body style=\"font-size:12pt;\">%a%b</font></body>"
+	  }
+	  else {
+	    if(%DayColor{style}) {
+	      if(%DayColor{gras}) %msg2 = <b>%msg2</b>
+	      if(%DayColor{soul}) %msg2 = <u>%msg2</u>
+	      %msg .= "<body bgcolor=\""#$Day::mircol(%DayColor{fond})"\"><font color=\""#$Day::mircol(%DayColor{text})"\" style=\"font-size:12pt;\">%msg2</font></body>"
+	    }
+	    else %msg .= "<body style=\"font-size:12pt;\">%msg2</font></body>"
+	  }
+	  %WidgetShow2->%color->%label4->$settext(%msg)
+	}
+	%WidgetShow2->$show()
+}
+
+
+alias(Day::load)
+{
+	%id = $config.open(day.kvc)
+	foreach(%varname,maj,style,stop,majcol,gras,soul,text,fond)
+	  %DayColor{%varname} = $config.read(%id,%varname)
+	config.close %id
+}
+
+
+alias(Day::match)
+{
+	if($2){
+	  if($str.match($0,$1,$2))
+	    return 1
+	  else
+	    return 0
+	}
+	else {
+	  if($str.match($0,$1))
+	    return 1
+	  else
+	    return 0
+	}
+}
+
+
+alias(Day::matchc)
+{
+	if($2){
+	  if($str.match($0,$1,1,$2)) return 1
+	  else return 0
+	else {
+	  if($str.match($0,$1,1,r)) return 1
+	  else return 0
+	}
+}
+
+
+alias(Day::mircol)
+{
+	switch($0) {
+	  case(00): return "FFFFFF"
+	  case(01): return "000000"
+	  case(02): return "0000AF"
+	  case(03): return "007F00"
+	  case(04): return "EF0000"
+	  case(05): return "873F00"
+	  case(06): return "8F008F"
+	  case(07): return "EF4F00"
+	  case(08): return "FFFF00"
+	  case(09): return "00FF00"
+	  case(10): return "007F87"
+	  case(11): return "00EFEF"
+	  case(12): return "2727FF"
+	  case(13): return "EF00EF"
+	  case(14): return "6F6F6F"
+	  case(15): return "C7C7C7"
+	  default : return "FFFFFF"
+	}
+}
+
+
+alias(Day::nickfirst)
+{
+	if($channel) {
+	  %txt = $0
+	  %cpt = $option(stringNickCompletionPostfix)
+	  if(%cpt != -1 && %cpt) {
+	    %pos=$str.findfirst(%txt,%cpt)
+	  }
+	  if(%pos != -1 && %pos) {
+	    %stxt = $str.left(%txt,%pos)
+	    %pos += $str.len(%cpt)
+	    %pos -= 1
+	    if($chan.ison(%stxt,$channel))
+	      return %pos
+	  }
+	  %pos = $str.findfirst(%txt," ")
+	  %stxtv = ""
+	  if(%pos !=- 1 && %pos) {
+	    %stxtv = $str.left(%txt,%pos)
+	    %tstxt = %stxtv" "
+	    %pos = $str.findfirst(%tstxt,", ")
+	    if(%pos !=-1 && %pos)
+	      %stxtv = $str.left(%tstxt,%pos)
+	  }
+	  if(%stxtv) {
+	    if($chan.ison(%stxtv,$channel))
+	      return $str.findfirst(%txt," ")
+	  }
+	  %pos = $str.findfirst(%txt," ")
+	  %stxtp = ""
+	  if(%pos != -1 && %pos) {
+	    %stxtp = $str.left(%txt,%pos)
+	    %tstxt = %stxtp" "
+	    %pos = $str.findfirst(%tstxt,"... ")
+	    if(%pos !=-1 && %pos)
+	      %stxtp = $str.left(%tstxt,%pos)
+	  }
+	  if(%stxtp) {
+	    if($chan.ison(%stxtp,$channel))
+	      return $str.findfirst(%txt," ")
+	# pseudo collé
+	  }
+	  if(!%stxt && !%stxtv && !%stxtp)
+	    return 0
+	# pseudo seul
+	}
+	else
+	  return 0
+	# pas sur un salon
+}
+
+
+alias(Day::save)
+{
+	%id = $config.open(day.kvc)
+	foreach(%varname,maj,style,stop,majcol,gras,soul,text,fond)
+	config.write %id %varname %DayColor{%varname}
+	config.close %id
+	Day::load
+}
+
+
